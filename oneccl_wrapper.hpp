@@ -122,8 +122,8 @@ void report_results(benchmark::State& state, const InViewType& in,
                 MPI_COMM_WORLD);
 
   state.SetIterationTime(max_time);
-  state.counters["MB (In)"]  = benchmark::Counter(in_data_processed);
-  state.counters["MB (Out)"] = benchmark::Counter(out_data_processed);
+  state.counters["In (MB)"]  = benchmark::Counter(in_data_processed);
+  state.counters["Out (MB)"] = benchmark::Counter(out_data_processed);
 }
 
 
