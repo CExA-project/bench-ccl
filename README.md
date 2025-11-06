@@ -68,3 +68,58 @@ benchmark_all2all<double, Kokkos::LayoutRight, CommTag::CCL_Tag>/N:2048/manual_t
 benchmark_all2all<double, Kokkos::LayoutRight, CommTag::CCL_Tag>/N:4096/manual_time        111 ms          111 ms            6 In (MB)=134.48 Out (MB)=134.48
 benchmark_all2all<double, Kokkos::LayoutRight, CommTag::CCL_Tag>/N:8192/manual_time        465 ms          464 ms            2 In (MB)=537.919 Out (MB)=537.919
 ```
+
+## GPU (HIP backend on Adastra)
+
+```bash
+module purge
+module load cpe/24.07
+module load craype-x86-trento craype-accel-amd-gfx90a
+module load PrgEnv-gnu-amd
+module load amd-mixed/6.3.3
+module load cmake/3.27.9
+
+cmake -B build \
+      -DCMAKE_CXX_COMPILER=hipcc \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DKokkos_ENABLE_HIP=ON \
+      -DKokkos_ARCH_AMD_GFX90A=ON \
+      -DCMAKE_EXE_LINKER_FLAGS="${PE_MPICH_GTL_DIR_amd_gfx90a} ${PE_MPICH_GTL_LIBS_amd_gfx90a}"
+
+export MPICH_GPU_SUPPORT_ENABLED=1
+
+srun --ntasks-per-node=8 --cpu-bind=none \
+    -- build/benchmark-ccls
+```
+
+## Results
+
+```
+----------------------------------------------------------------------------------------------------------------------------------------------
+Benchmark                                                                                    Time             CPU   Iterations UserCounters...
+----------------------------------------------------------------------------------------------------------------------------------------------
+benchmark_all2all<double, Kokkos::LayoutLeft, CommTag::MPI_Tag>/N:256/manual_time        0.168 ms        0.183 ms         3889 In (MB)=0.524288 Out (MB)=0.524288
+benchmark_all2all<double, Kokkos::LayoutLeft, CommTag::MPI_Tag>/N:512/manual_time        0.174 ms        0.188 ms         3961 In (MB)=2.09715 Out (MB)=2.09715
+benchmark_all2all<double, Kokkos::LayoutLeft, CommTag::MPI_Tag>/N:1024/manual_time       0.750 ms        0.756 ms          773 In (MB)=8.38861 Out (MB)=8.38861
+benchmark_all2all<double, Kokkos::LayoutLeft, CommTag::MPI_Tag>/N:2048/manual_time        2.80 ms         2.81 ms          239 In (MB)=33.5544 Out (MB)=33.5544
+benchmark_all2all<double, Kokkos::LayoutLeft, CommTag::MPI_Tag>/N:4096/manual_time        10.8 ms         10.8 ms           63 In (MB)=134.218 Out (MB)=134.218
+benchmark_all2all<double, Kokkos::LayoutLeft, CommTag::MPI_Tag>/N:8192/manual_time        43.3 ms         43.2 ms           16 In (MB)=536.871 Out (MB)=536.871
+benchmark_all2all<double, Kokkos::LayoutRight, CommTag::MPI_Tag>/N:256/manual_time       0.161 ms        0.169 ms         4172 In (MB)=0.524288 Out (MB)=0.524288
+benchmark_all2all<double, Kokkos::LayoutRight, CommTag::MPI_Tag>/N:512/manual_time       0.175 ms        0.183 ms         3865 In (MB)=2.09715 Out (MB)=2.09715
+benchmark_all2all<double, Kokkos::LayoutRight, CommTag::MPI_Tag>/N:1024/manual_time      0.756 ms        0.761 ms          752 In (MB)=8.38861 Out (MB)=8.38861
+benchmark_all2all<double, Kokkos::LayoutRight, CommTag::MPI_Tag>/N:2048/manual_time       2.81 ms         2.81 ms          236 In (MB)=33.5544 Out (MB)=33.5544
+benchmark_all2all<double, Kokkos::LayoutRight, CommTag::MPI_Tag>/N:4096/manual_time       10.8 ms         10.8 ms           63 In (MB)=134.218 Out (MB)=134.218
+benchmark_all2all<double, Kokkos::LayoutRight, CommTag::MPI_Tag>/N:8192/manual_time       43.4 ms         43.3 ms           16 In (MB)=536.871 Out (MB)=536.871
+benchmark_all2all<double, Kokkos::LayoutLeft, CommTag::CCL_Tag>/N:256/manual_time        0.688 ms        0.576 ms          730 In (MB)=0.524288 Out (MB)=0.524288
+benchmark_all2all<double, Kokkos::LayoutLeft, CommTag::CCL_Tag>/N:512/manual_time         1.72 ms         1.48 ms          330 In (MB)=2.09715 Out (MB)=2.09715
+benchmark_all2all<double, Kokkos::LayoutLeft, CommTag::CCL_Tag>/N:1024/manual_time        6.67 ms         5.56 ms           83 In (MB)=8.38861 Out (MB)=8.38861
+benchmark_all2all<double, Kokkos::LayoutLeft, CommTag::CCL_Tag>/N:2048/manual_time        25.2 ms         22.0 ms           28 In (MB)=33.5544 Out (MB)=33.5544
+benchmark_all2all<double, Kokkos::LayoutLeft, CommTag::CCL_Tag>/N:4096/manual_time         100 ms         86.6 ms            7 In (MB)=134.218 Out (MB)=134.218
+benchmark_all2all<double, Kokkos::LayoutLeft, CommTag::CCL_Tag>/N:8192/manual_time         377 ms          333 ms            2 In (MB)=536.871 Out (MB)=536.871
+benchmark_all2all<double, Kokkos::LayoutRight, CommTag::CCL_Tag>/N:256/manual_time       0.617 ms        0.514 ms          838 In (MB)=0.524288 Out (MB)=0.524288
+benchmark_all2all<double, Kokkos::LayoutRight, CommTag::CCL_Tag>/N:512/manual_time        1.85 ms         1.60 ms          353 In (MB)=2.09715 Out (MB)=2.09715
+benchmark_all2all<double, Kokkos::LayoutRight, CommTag::CCL_Tag>/N:1024/manual_time       6.24 ms         5.15 ms           87 In (MB)=8.38861 Out (MB)=8.38861
+benchmark_all2all<double, Kokkos::LayoutRight, CommTag::CCL_Tag>/N:2048/manual_time       27.7 ms         22.9 ms           19 In (MB)=33.5544 Out (MB)=33.5544
+benchmark_all2all<double, Kokkos::LayoutRight, CommTag::CCL_Tag>/N:4096/manual_time       98.3 ms         81.6 ms            7 In (MB)=134.218 Out (MB)=134.218
+benchmark_all2all<double, Kokkos::LayoutRight, CommTag::CCL_Tag>/N:8192/manual_time        383 ms          314 ms            2 In (MB)=536.871 Out (MB)=536.871
+```
